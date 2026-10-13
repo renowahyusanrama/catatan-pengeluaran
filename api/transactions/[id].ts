@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabase, serializeTransaction, TransactionRow } from '../_lib/db';
+import { deleteTransaction, updateTransaction } from '../_lib/db';
 import { dbError, handleCors, parseBody, requireAuth, sendJson } from '../_lib/http';
 import { isIsoDate, parsePositiveInt } from '../_lib/validation';
 
@@ -7,7 +7,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleCors(req, res)) return;
   if (!requireAuth(req, res)) return;
 
-  const id = Array.isArray(req.query.id) ? req.query.id[0] : req.query.id;
+  const raw = req.query.id;
+  const id = Array.isArray(raw) ? raw[0] : raw;
   if (!id) {
     sendJson(res, 400, { error: 'INVALID_ID' });
     return;
@@ -48,19 +49,11 @@ async function update(req: VercelRequest, res: VercelResponse, id: string) {
     patch.note = note === '' ? null : note;
   }
 
-  const { data, error } = await getSupabase()
-    .from('transactions')
-    .update(patch)
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) return sendJson(res, 500, { error: 'DB_ERROR', detail: error.message });
-  sendJson(res, 200, { data: serializeTransaction(data as TransactionRow) });
+  const updated = await updateTransaction(id, patch);
+  sendJson(res, 200, { data: updated });
 }
 
 async function remove(res: VercelResponse, id: string) {
-  const { error } = await getSupabase().from('transactions').delete().eq('id', id);
-  if (error) return sendJson(res, 500, { error: 'DB_ERROR', detail: error.message });
+  await deleteTransaction(id);
   sendJson(res, 200, { ok: true });
 }

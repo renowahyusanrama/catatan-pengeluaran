@@ -1,7 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabase, serializeTransaction, TransactionRow } from '../_lib/db';
+import { createTransaction, deleteAllTransactions, listTransactions } from '../_lib/db';
 import { dbError, handleCors, parseBody, requireAuth, sendJson } from '../_lib/http';
 import { CATEGORIES, isIsoDate, parsePositiveInt } from '../_lib/validation';
+
+function qString(value: string | string[] | undefined): string | undefined {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) return value[0];
+  return undefined;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleCors(req, res)) return;
@@ -18,31 +24,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 }
 
 async function list(req: VercelRequest, res: VercelResponse) {
-  const { from, to, category, q, limit, offset } = req.query;
+  const from = qString(req.query.from);
+  const to = qString(req.query.to);
+  const category = qString(req.query.category);
+  const q = qString(req.query.q);
+  const limit = qString(req.query.limit);
+  const offset = qString(req.query.offset);
 
-  let query = getSupabase().from('transactions').select('*', { count: 'exact' });
+  const result = await listTransactions({
+    from: from && isIsoDate(from) ? from : undefined,
+    to: to && isIsoDate(to) ? to : undefined,
+    category: category && category !== '' ? category : undefined,
+    q: q && q.trim() !== '' ? q.trim() : undefined,
+    limit: limit ? parseInt(limit, 10) : undefined,
+    offset: offset ? parseInt(offset, 10) : undefined,
+  });
 
-  if (typeof from === 'string' && isIsoDate(from)) query = query.gte('date', from);
-  if (typeof to === 'string' && isIsoDate(to)) query = query.lte('date', to);
-  if (typeof category === 'string' && category !== '') query = query.eq('category', category);
-  if (typeof q === 'string' && q.trim() !== '') query = query.ilike('description', `%${q.trim()}%`);
-
-  const parsedLimit = typeof limit === 'string' ? parseInt(limit, 10) : NaN;
-  const parsedOffset = typeof offset === 'string' ? parseInt(offset, 10) : NaN;
-  const take = Number.isFinite(parsedLimit) && parsedLimit > 0 ? Math.min(parsedLimit, 5000) : 5000;
-  const skip = Number.isFinite(parsedOffset) && parsedOffset > 0 ? parsedOffset : 0;
-
-  const { data, error, count } = await query
-    .order('date', { ascending: false })
-    .order('created_at', { ascending: false })
-    .range(skip, skip + take - 1);
-
-  if (error) {
-    sendJson(res, 500, { error: 'DB_ERROR', detail: error.message });
-    return;
-  }
-
-  sendJson(res, 200, { data: (data as TransactionRow[]).map(serializeTransaction), total: count ?? 0 });
+  sendJson(res, 200, result);
 }
 
 async function create(req: VercelRequest, res: VercelResponse) {
@@ -59,18 +57,18 @@ async function create(req: VercelRequest, res: VercelResponse) {
 
   const finalCategory: string = CATEGORIES.includes(category as never) || category.length > 0 ? category : 'Lainnya';
 
-  const { data, error } = await getSupabase()
-    .from('transactions')
-    .insert({ amount, description, category: finalCategory, date, note: note === '' ? null : note })
-    .select()
-    .single();
+  const created = await createTransaction({
+    amount,
+    description,
+    category: finalCategory,
+    date,
+    note,
+  });
 
-  if (error) return sendJson(res, 500, { error: 'DB_ERROR', detail: error.message });
-  sendJson(res, 201, { data: serializeTransaction(data as TransactionRow) });
+  sendJson(res, 201, { data: created });
 }
 
 async function removeAll(res: VercelResponse) {
-  const { error } = await getSupabase().from('transactions').delete().not('id', 'is', null);
-  if (error) return sendJson(res, 500, { error: 'DB_ERROR', detail: error.message });
+  await deleteAllTransactions();
   sendJson(res, 200, { ok: true });
 }

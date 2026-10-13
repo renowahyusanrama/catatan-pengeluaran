@@ -1,13 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabase } from './_lib/db';
+import { getBudget, setBudget } from './_lib/db';
 import { dbError, handleCors, parseBody, requireAuth, sendJson } from './_lib/http';
 import { isMonth, parseNonNegative } from './_lib/validation';
-
-interface BudgetRow {
-  month: string;
-  amount: number;
-  updated_at: string;
-}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleCors(req, res)) return;
@@ -23,21 +17,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 }
 
 async function get(req: VercelRequest, res: VercelResponse) {
-  const month = typeof req.query.month === 'string' ? req.query.month : '';
+  const raw = req.query.month;
+  const month = Array.isArray(raw) ? raw[0] : raw;
   if (!isMonth(month)) {
     sendJson(res, 400, { error: 'INVALID_MONTH' });
     return;
   }
-
-  const { data, error } = await getSupabase().from('budgets').select('*').eq('month', month).maybeSingle();
-  if (error) {
-    sendJson(res, 500, { error: 'DB_ERROR', detail: error.message });
-    return;
-  }
-
-  sendJson(res, 200, {
-    budget: data ? { month: (data as BudgetRow).month, amount: Number((data as BudgetRow).amount) } : null,
-  });
+  const budget = await getBudget(month);
+  sendJson(res, 200, { budget });
 }
 
 async function put(req: VercelRequest, res: VercelResponse) {
@@ -52,17 +39,6 @@ async function put(req: VercelRequest, res: VercelResponse) {
     sendJson(res, 400, { error: 'INVALID_AMOUNT' });
     return;
   }
-
-  const { data, error } = await getSupabase()
-    .from('budgets')
-    .upsert({ month, amount, updated_at: new Date().toISOString() })
-    .select()
-    .single();
-
-  if (error) {
-    sendJson(res, 500, { error: 'DB_ERROR', detail: error.message });
-    return;
-  }
-
-  sendJson(res, 200, { budget: { month: (data as BudgetRow).month, amount: Number((data as BudgetRow).amount) } });
+  const budget = await setBudget(month, amount);
+  sendJson(res, 200, { budget });
 }

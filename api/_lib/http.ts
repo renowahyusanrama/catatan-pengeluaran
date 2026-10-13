@@ -57,5 +57,7 @@ export function dbError(res: VercelResponse, err: unknown): void {
     sendJson(res, 503, { error: 'NOT_CONFIGURED' });
     return;
   }
-  sendJson(res, 500, { error: 'SERVER_ERROR' });
+  // Dicatat ke runtime log Vercel untuk memudahkan diagnosis.
+  console.error('[api] error:', err);
+  sendJson(res, 500, { error: 'DB_ERROR' });
 }
