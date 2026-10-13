@@ -15,7 +15,7 @@
     "build:server": "npm run build -w server",
     "start:server": "npm run start -w server",
     "typecheck": "npm run typecheck -w client",
-    "typecheck:api": "tsc --noEmit -p api/tsconfig.json"
+    "typecheck:api": "tsc --noEmit -p tsconfig.api.json"
   },
   "devDependencies": {
     "@vercel/node": "^3.2.24",
