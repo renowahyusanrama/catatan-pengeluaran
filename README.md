@@ -37,9 +37,15 @@ Website pencatatan pengeluaran pribadi yang minimalis, ringan, dan berfungsi pen
 │   │   ├── pages/           # Dashboard, Transaksi, Laporan, Pengaturan
 │   │   └── hooks/           # useToday (rollover tengah malam)
 │   └── .env.example
-├── server/                  # API Express (menyimpan service-role key)
+├── server/                  # API Express (untuk lokal / server biasa)
 │   ├── src/
 │   └── .env.example
+├── api/                     # API serverless untuk Vercel (produksi)
+│   ├── health.ts
+│   ├── transactions/
+│   ├── budget.ts
+│   └── _lib/                # Validasi + koneksi Supabase bersama
+├── vercel.json              # Konfigurasi deploy Vercel
 ├── sql/schema.sql           # Skema tabel + keamanan RLS
 └── package.json             # Workspace root
 ```
@@ -144,32 +150,46 @@ Karena aplikasi **tidak memakai login**, arsitektur sengaja dirancang agar data 
 
 ## 4. Deployment
 
-### Frontend (statis)
+Ada **dua cara**. Cara termudah (dan gratis tanpa kartu) adalah menaruh frontend + API di **Vercel**.
 
-Build lalu deploy `client/dist` ke Vercel/Netlify.
+### A. Vercel saja (frontend + API serverless) — direkomendasikan
 
-```bash
-npm run build
-```
+Repo ini sudah disiapkan untuk Vercel:
+- Frontend (Vite) dibangun ke `client/dist`.
+- API tersedia sebagai **serverless functions** di folder `api/` (endpoint sama: `/api/health`, `/api/transactions`, `/api/budget`).
+- Karena satu domain, frontend memanggil API dengan path relatif (tidak perlu URL backend terpisah).
 
-Set environment variable pada platform:
+Langkah:
+1. Push repo ke GitHub.
+2. Buka [vercel.com](https://vercel.com) → **Add New → Project** → import repo.
+3. **Jangan ubah** Root Directory (biarkan root repo). Vercel membaca `vercel.json`.
+4. Tambahkan **Environment Variables** (untuk fungsinya, bukan `VITE_`):
+   | Key | Value |
+   | --- | --- |
+   | `SUPABASE_URL` | `https://<project>.supabase.co` |
+   | `SUPABASE_SERVICE_ROLE_KEY` | service-role key kamu |
+   | `ACCESS_KEY` | kunci akses bersama |
+   | `VITE_API_URL` | `same-origin` |
+5. **Deploy**. Buka URL Vercel → halaman **Pengaturan** → masukkan `ACCESS_KEY` → **Simpan & Sambungkan**.
 
-```
-VITE_API_URL=https://api-mu.com
-```
+> `.env` asli tidak ikut ter-commit; semua kredensial diisi lewat Environment Variables Vercel.
 
-### Backend
+### B. Frontend terpisah + backend Node (Express)
 
-Deploy `server/` ke Node.js host (Railway, Render, Fly.io, dsb), atau VM sendiri:
+Kalau mau backend Express berjalan sebagai server biasa (Railway/Render/Fly.io/VM):
 
 ```bash
 npm run build:server
 npm run start:server
 ```
 
-Set environment variables backend: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ACCESS_KEY`, `PORT`.
+Set env backend: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ACCESS_KEY`, `PORT`.
+
+Frontend: `npm run build` lalu deploy `client/dist`, dan set `VITE_API_URL=https://<url-backend>`.
 
 > Pastikan backend mengizinkan CORS dari domain frontend. Untuk keamanan lebih ketat, batasi origin pada konfigurasi CORS.
+
+Catatan: backend tersedia dalam **dua bentuk** — Express (`server/`) untuk lokal/produksi biasa, dan serverless (`api/`) untuk Vercel. Logika validasinya dijaga tetap sama.
 
 ---
 

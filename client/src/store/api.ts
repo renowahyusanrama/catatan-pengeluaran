@@ -1,7 +1,12 @@
 import type { Transaction, Budget, TransactionInput, ListResult, ApiError } from '../lib/types';
 import { getAccessKey } from './localStore';
 
-let baseUrl = (import.meta.env.VITE_API_URL as string | undefined) || '';
+let baseUrl = ((import.meta.env.VITE_API_URL as string | undefined) ?? '').trim();
+// Nilai khusus "same-origin" -> pakai API di domain yang sama (untuk deploy Vercel).
+const sameOrigin = baseUrl.toLowerCase() === 'same-origin';
+if (sameOrigin) baseUrl = '';
+baseUrl = baseUrl.replace(/\/+$/, '');
+let remoteEnabled = sameOrigin || baseUrl.length > 0;
 
 export function getApiUrl(): string {
   return baseUrl;
@@ -9,10 +14,11 @@ export function getApiUrl(): string {
 
 export function setApiUrl(url: string): void {
   baseUrl = url.replace(/\/+$/, '');
+  remoteEnabled = true;
 }
 
 export function isRemoteConfigured(): boolean {
-  return baseUrl.trim().length > 0;
+  return remoteEnabled;
 }
 
 function authHeaders(): Record<string, string> {
