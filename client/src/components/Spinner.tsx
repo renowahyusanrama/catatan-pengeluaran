@@ -1,7 +1,7 @@
 export function Spinner({ size = 20 }: { size?: number }) {
   return (
     <svg
-      className="animate-spin text-gray-400"
+      className="animate-spin text-ink-muted"
       width={size}
       height={size}
       viewBox="0 0 24 24"
@@ -16,7 +16,7 @@ export function Spinner({ size = 20 }: { size?: number }) {
 
 export function FullPageSpinner() {
   return (
-    <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-gray-500">
+    <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-ink-muted">
       <Spinner size={28} />
       <p className="text-sm">Memuat data…</p>
     </div>

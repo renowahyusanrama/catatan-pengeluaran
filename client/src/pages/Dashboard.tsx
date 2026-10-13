@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Wallet, CalendarDays, CalendarRange, ReceiptText, ChevronRight, Inbox } from 'lucide-react';
+import { ChevronRight, Inbox } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToday } from '../hooks/useToday';
 import { formatIDR } from '../lib/format';
-import { currentMonth, monthRangeISO, startOfWeekISO, endOfWeekISO } from '../lib/dates';
+import { currentMonth, monthLabel, monthRangeISO, startOfWeekISO, endOfWeekISO } from '../lib/dates';
 import { sumAmount, filterRange, countTx, categoryTotals } from '../lib/analytics';
 import { StatCard } from '../components/StatCard';
 import { BudgetBar } from '../components/BudgetBar';
@@ -35,7 +35,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (p: Page) => void }) {
   const monthCount = countTx(monthTx);
 
   const categories = categoryTotals(monthTx);
-  const recent = transactions.slice(0, 5);
+  const recent = transactions.slice(0, 6);
 
   const onConfirmDelete = async () => {
     if (!pendingDelete) return;
@@ -46,9 +46,9 @@ export function Dashboard({ onNavigate }: { onNavigate: (p: Page) => void }) {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-7">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">Ringkasan</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">Ringkasan</h1>
         {monthTx.length > 0 && (
           <button
             type="button"
@@ -61,51 +61,56 @@ export function Dashboard({ onNavigate }: { onNavigate: (p: Page) => void }) {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard label="Hari ini" value={formatIDR(todayTotal)} icon={<CalendarDays size={16} />} />
-        <StatCard label="Minggu ini" value={formatIDR(weekTotal)} icon={<CalendarRange size={16} />} />
-        <StatCard label="Bulan ini" value={formatIDR(monthTotal)} icon={<Wallet size={16} />} />
-        <StatCard label="Transaksi" value={String(monthCount)} hint="bulan ini" icon={<ReceiptText size={16} />} accent="bg-gray-300" />
-      </div>
-
-      {budget !== null && (
-        <div className="card p-4">
-          <p className="mb-3 text-sm font-medium text-gray-700">Anggaran bulan ini</p>
-          <BudgetBar budget={budget} spent={monthTotal} />
-        </div>
-      )}
-
       {loading ? (
-        <div className="card p-8 text-center text-sm text-gray-500">Memuat…</div>
+        <div className="py-16 text-center text-sm text-ink-muted">Memuat…</div>
       ) : transactions.length === 0 ? (
         <EmptyState
-          icon={<Inbox size={32} />}
+          icon={<Inbox size={36} />}
           title="Belum ada pengeluaran"
           description="Mulai catat pengeluaran pertama kamu hari ini."
           action={
-            <button type="button" onClick={openAdd} className="btn-primary px-4 py-2 text-sm">
+            <button type="button" onClick={openAdd} className="btn-primary px-5 py-2.5 text-sm">
               Tambah Pengeluaran
             </button>
           }
         />
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-            {categories.length > 0 && (
-              <div className="card p-4">
-                <p className="mb-3 text-sm font-medium text-gray-700">Kategori terbesar</p>
-                <CategoryList totals={categories.slice(0, 5)} total={sumAmount(monthTx)} />
+          <section>
+            <p className="text-sm font-medium text-ink-muted">{monthLabel(month)}</p>
+            <p className="tnum mt-1 text-4xl font-semibold tracking-tightest text-ink sm:text-5xl">
+              {formatIDR(monthTotal)}
+            </p>
+
+            {budget !== null && (
+              <div className="mt-5 max-w-lg">
+                <BudgetBar budget={budget} spent={monthTotal} />
               </div>
             )}
 
-            <div className="card">
-              <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-                <p className="text-sm font-medium text-gray-700">Transaksi terbaru</p>
+            <div className="mt-7 grid grid-cols-3 gap-4 max-w-md">
+              <StatCard label="Hari ini" value={formatIDR(todayTotal)} />
+              <StatCard label="Minggu ini" value={formatIDR(weekTotal)} />
+              <StatCard label="Transaksi" value={String(monthCount)} hint="bulan ini" />
+            </div>
+          </section>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {categories.length > 0 && (
+              <div className="card p-5">
+                <p className="mb-4 text-sm font-medium text-ink-soft">Kategori terbesar</p>
+                <CategoryList totals={categories.slice(0, 5)} total={monthTotal} />
+              </div>
+            )}
+
+            <div className="card p-2">
+              <div className="flex items-center justify-between px-3 py-2.5">
+                <p className="text-sm font-medium text-ink-soft">Transaksi terbaru</p>
               </div>
               {recent.length === 0 ? (
-                <p className="px-4 py-6 text-center text-sm text-gray-500">Tidak ada transaksi.</p>
+                <p className="px-3 py-6 text-center text-sm text-ink-muted">Tidak ada transaksi.</p>
               ) : (
-                <ul className="divide-y divide-gray-100">
+                <ul className="space-y-0.5">
                   {recent.map((tx) => (
                     <TransactionItem key={tx.id} tx={tx} onEdit={openEdit} onDelete={setPendingDelete} />
                   ))}

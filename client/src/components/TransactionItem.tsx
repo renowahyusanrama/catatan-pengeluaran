@@ -12,39 +12,39 @@ interface TransactionItemProps {
 
 export function TransactionItem({ tx, onEdit, onDelete, showDate = true }: TransactionItemProps) {
   return (
-    <li className="flex items-center justify-between gap-3 px-4 py-3">
+    <li className="group flex items-center justify-between gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-fill">
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-gray-900">{tx.description}</p>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500">
-          <span className="inline-flex items-center rounded-md bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600">
-            {tx.category}
-          </span>
+        <p className="truncate text-sm font-medium text-ink">{tx.description}</p>
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-ink-muted">
           {showDate && (
             <span>
               {weekdayName(tx.date)}, {formatDate(tx.date)}
             </span>
           )}
-          {tx.note && <span className="text-gray-400">· {tx.note}</span>}
+          {tx.category && (
+            <span className="text-ink-muted/80">· {tx.category}</span>
+          )}
         </div>
+        {tx.note && <p className="mt-0.5 truncate text-sm text-ink-muted">{tx.note}</p>}
       </div>
 
-      <div className="flex shrink-0 items-center gap-1">
-        <span className="text-sm font-semibold text-gray-900">{formatIDR(tx.amount)}</span>
+      <div className="flex shrink-0 items-center gap-0.5">
+        <span className="tnum text-sm font-semibold text-ink">{formatIDR(tx.amount)}</span>
         <button
           type="button"
           onClick={() => onEdit(tx)}
-          className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+          className="grid h-8 w-8 place-items-center rounded-full text-ink-muted opacity-100 transition-colors hover:bg-surface hover:text-ink sm:opacity-0 sm:group-hover:opacity-100"
           aria-label="Edit"
         >
-          <Pencil size={15} />
+          <Pencil size={16} />
         </button>
         <button
           type="button"
           onClick={() => onDelete(tx)}
-          className="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+          className="grid h-8 w-8 place-items-center rounded-full text-ink-muted transition-colors hover:bg-red-50 hover:text-red-600 sm:opacity-0 sm:group-hover:opacity-100"
           aria-label="Hapus"
         >
-          <Trash2 size={15} />
+          <Trash2 size={16} />
         </button>
       </div>
     </li>

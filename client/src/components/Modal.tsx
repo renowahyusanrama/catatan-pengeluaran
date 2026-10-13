@@ -27,24 +27,26 @@ export function Modal({ title, open, onClose, children, maxWidth = 'max-w-md' }:
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-gray-900/40 p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/30 sm:items-center sm:p-6"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
+      role="dialog"
+      aria-modal="true"
     >
-      <div className={`w-full ${maxWidth} rounded-t-2xl bg-white shadow-xl sm:rounded-xl`}>
-        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 sm:px-5">
-          <h2 className="text-base font-semibold text-gray-900">{title}</h2>
+      <div className={`w-full ${maxWidth} rounded-t-3xl bg-surface sm:rounded-3xl`}>
+        <div className="flex items-center justify-between px-5 py-4 sm:px-6">
+          <h2 className="text-lg font-semibold tracking-tight text-ink">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+            className="grid h-9 w-9 place-items-center rounded-full text-ink-muted transition-colors hover:bg-fill hover:text-ink"
             aria-label="Tutup"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
-        <div className="max-h-[85vh] overflow-y-auto px-4 py-4 sm:px-5">{children}</div>
+        <div className="max-h-[80vh] overflow-y-auto px-5 pb-6 sm:px-6">{children}</div>
       </div>
     </div>
   );

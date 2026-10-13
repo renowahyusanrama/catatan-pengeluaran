@@ -4,17 +4,26 @@ export default {
   theme: {
     extend: {
       colors: {
+        ground: '#f6f6f3',
+        surface: '#ffffff',
+        fill: '#f0f1ec',
+        line: '#e5e6df',
+        ink: {
+          DEFAULT: '#171914',
+          soft: '#555a52',
+          muted: '#8a8f85',
+        },
         brand: {
-          50: '#eefbf3',
-          100: '#d6f5e1',
-          200: '#b0eac8',
-          300: '#7dd8a8',
-          400: '#48c083',
-          500: '#23a466',
-          600: '#178552',
-          700: '#146a44',
-          800: '#135438',
-          900: '#10452f',
+          50: '#ecf5ef',
+          100: '#d3e9dc',
+          200: '#a7d2ba',
+          300: '#74b393',
+          400: '#469371',
+          500: '#277b59',
+          600: '#1a6a4a',
+          700: '#15553c',
+          800: '#124530',
+          900: '#103a29',
         },
       },
       fontFamily: {
@@ -28,6 +37,9 @@ export default {
           'Arial',
           'sans-serif',
         ],
+      },
+      letterSpacing: {
+        tightest: '-0.03em',
       },
     },
   },

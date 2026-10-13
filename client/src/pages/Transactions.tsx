@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Search, Inbox, CalendarDays } from 'lucide-react';
+import { Search, Inbox } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToday } from '../hooks/useToday';
 import { CATEGORIES } from '../lib/categories';
@@ -73,28 +73,28 @@ export function Transactions() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">Transaksi</h1>
-        <button type="button" onClick={openAdd} className="btn-primary px-3 py-2 text-sm">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">Transaksi</h1>
+        <button type="button" onClick={openAdd} className="btn-primary px-5 py-2 text-sm">
           Tambah
         </button>
       </div>
 
-      <div className="card space-y-3 p-3 sm:p-4">
+      <div className="space-y-3">
         <div className="relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-muted" />
           <input
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Cari nama transaksi…"
-            className="input pl-9"
+            className="input pl-11"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {(
               [
                 ['all', 'Semua'],
@@ -107,21 +107,19 @@ export function Transactions() {
                 key={key}
                 type="button"
                 onClick={() => applyPreset(key)}
-                className={`rounded-lg border px-3 py-1.5 text-sm font-medium ${
-                  preset === key
-                    ? 'border-brand-600 bg-brand-50 text-brand-700'
-                    : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`chip ${preset === key ? 'bg-ink text-white' : 'bg-fill text-ink-soft hover:bg-line'}`}
               >
                 {label}
               </button>
             ))}
           </div>
+        </div>
 
+        <div className="flex flex-wrap items-center gap-2">
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="input w-auto px-3 py-1.5 text-sm"
+            className="input w-auto py-2.5 text-sm"
             aria-label="Filter kategori"
           >
             <option value="">Semua kategori</option>
@@ -131,54 +129,64 @@ export function Transactions() {
               </option>
             ))}
           </select>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <span className="flex items-center gap-1 text-gray-500">
-            <CalendarDays size={15} />
-            Dari
-          </span>
-          <input type="date" value={from} max={today} onChange={(e) => { setFrom(e.target.value); setPreset('all'); setVisible(PAGE_SIZE); }} className="input w-auto px-2 py-1.5" />
-          <span className="text-gray-500">sampai</span>
-          <input type="date" value={to} max={today} onChange={(e) => { setTo(e.target.value); setPreset('all'); setVisible(PAGE_SIZE); }} className="input w-auto px-2 py-1.5" />
-          {(from || to) && (
-            <button type="button" onClick={() => applyPreset('all')} className="text-sm text-brand-600 hover:underline">
-              Reset
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={from}
+              max={today}
+              onChange={(e) => { setFrom(e.target.value); setPreset('all'); setVisible(PAGE_SIZE); }}
+              className="input w-auto py-2.5 text-sm"
+              aria-label="Dari tanggal"
+            />
+            <span className="text-sm text-ink-muted">sampai</span>
+            <input
+              type="date"
+              value={to}
+              max={today}
+              onChange={(e) => { setTo(e.target.value); setPreset('all'); setVisible(PAGE_SIZE); }}
+              className="input w-auto py-2.5 text-sm"
+              aria-label="Sampai tanggal"
+            />
+            {(from || to) && (
+              <button type="button" onClick={() => applyPreset('all')} className="btn-ghost px-3 py-2 text-sm">
+                Reset
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       <div className="flex items-center justify-between px-1 text-sm">
-        <span className="text-gray-500">
+        <span className="text-ink-muted">
           {filtered.length} transaksi
         </span>
-        {filtered.length > 0 && <span className="font-medium text-gray-900">{formatIDR(totalFiltered)}</span>}
+        {filtered.length > 0 && <span className="tnum font-medium text-ink">{formatIDR(totalFiltered)}</span>}
       </div>
 
       {loading ? (
-        <div className="card p-8 text-center text-sm text-gray-500">Memuat…</div>
+        <div className="py-16 text-center text-sm text-ink-muted">Memuat…</div>
       ) : filtered.length === 0 ? (
         <EmptyState
-          icon={<Inbox size={32} />}
+          icon={<Inbox size={36} />}
           title="Tidak ada transaksi"
           description="Coba ubah filter atau tambahkan pengeluaran baru."
           action={
-            <button type="button" onClick={openAdd} className="btn-primary px-4 py-2 text-sm">
+            <button type="button" onClick={openAdd} className="btn-primary px-5 py-2.5 text-sm">
               Tambah Pengeluaran
             </button>
           }
         />
       ) : (
-        <div className="card overflow-hidden">
-          <ul className="divide-y divide-gray-100">
+        <div className="card overflow-hidden p-2">
+          <ul className="space-y-0.5">
             {visibleList.map((tx) => (
               <TransactionItem key={tx.id} tx={tx} onEdit={openEdit} onDelete={setPendingDelete} />
             ))}
           </ul>
           {visible < filtered.length && (
-            <div className="border-t border-gray-100 p-3 text-center">
-              <button type="button" onClick={() => setVisible((v) => v + PAGE_SIZE)} className="btn-secondary px-4 py-2 text-sm">
+            <div className="p-3 text-center">
+              <button type="button" onClick={() => setVisible((v) => v + PAGE_SIZE)} className="btn-secondary px-5 py-2.5 text-sm">
                 Muat lebih banyak ({filtered.length - visible} tersisa)
               </button>
             </div>

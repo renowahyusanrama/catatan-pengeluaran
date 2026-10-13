@@ -76,13 +76,15 @@ export function TransactionForm() {
       onClose={closeForm}
       maxWidth="max-w-lg"
     >
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div>
           <label htmlFor="amount" className="label">
             Nominal
           </label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-3 flex items-center text-sm text-gray-500">Rp</span>
+            <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-base font-medium text-ink-muted">
+              Rp
+            </span>
             <input
               id="amount"
               inputMode="numeric"
@@ -90,7 +92,7 @@ export function TransactionForm() {
               placeholder="0"
               value={formatInputIDR(amountDigits)}
               onChange={(e) => setAmountDigits(parseNumeric(e.target.value))}
-              className="input pl-10 text-base font-medium"
+              className="input tnum py-3.5 pl-12 text-2xl font-semibold tracking-tight"
               autoFocus
             />
           </div>
@@ -119,10 +121,10 @@ export function TransactionForm() {
                 key={c}
                 type="button"
                 onClick={() => setCategory(c)}
-                className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                className={`chip w-full justify-center py-2.5 ${
                   category === c
-                    ? 'border-brand-600 bg-brand-50 text-brand-700'
-                    : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
+                    ? 'bg-ink text-white'
+                    : 'bg-fill text-ink-soft hover:bg-line'
                 }`}
               >
                 {c}
@@ -144,12 +146,12 @@ export function TransactionForm() {
               onChange={(e) => setDate(e.target.value)}
               className="input"
             />
-            <p className="mt-1 text-xs text-gray-500">{formatDate(date || todayISO())}</p>
+            <p className="mt-1.5 text-sm text-ink-muted">{formatDate(date || todayISO())}</p>
           </div>
 
           <div>
             <label htmlFor="note" className="label">
-              Catatan <span className="font-normal text-gray-400">(opsional)</span>
+              Catatan <span className="font-normal text-ink-muted">(opsional)</span>
             </label>
             <input
               id="note"
@@ -163,13 +165,13 @@ export function TransactionForm() {
           </div>
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm font-medium text-red-600">{error}</p>}
 
         <div className="flex justify-end gap-2 pt-1">
-          <button type="button" className="btn-secondary px-4 py-2" onClick={closeForm} disabled={busy}>
+          <button type="button" className="btn-secondary px-5 py-2.5" onClick={closeForm} disabled={busy}>
             Batal
           </button>
-          <button type="button" className="btn-primary px-4 py-2" onClick={onSave} disabled={busy}>
+          <button type="button" className="btn-primary px-6 py-2.5" onClick={onSave} disabled={busy}>
             {busy ? 'Menyimpan…' : 'Simpan'}
           </button>
         </div>

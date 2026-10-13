@@ -31,13 +31,9 @@ function ConnectionBanner() {
   const info = map[dbStatus];
 
   return (
-    <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+    <div className="mb-5 flex items-center gap-2.5 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
       {info.icon}
-      <button
-        type="button"
-        className="text-left"
-        onClick={() => notify(info.text, 'info')}
-      >
+      <button type="button" className="text-left" onClick={() => notify(info.text, 'info')}>
         {info.text}
       </button>
     </div>

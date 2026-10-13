@@ -9,7 +9,7 @@
   }
 
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-ground text-ink antialiased;
     font-feature-settings: 'cv11', 'ss01';
   }
 
@@ -23,11 +23,11 @@
 
 @layer components {
   .card {
-    @apply rounded-xl border border-gray-200 bg-white;
+    @apply rounded-2xl bg-surface;
   }
 
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/40 disabled:cursor-not-allowed disabled:opacity-40;
   }
 
   .btn-primary {
@@ -35,19 +35,27 @@
   }
 
   .btn-secondary {
-    @apply btn border border-gray-300 bg-white text-gray-700 hover:bg-gray-50;
+    @apply btn bg-fill text-ink hover:bg-line;
   }
 
   .btn-danger {
-    @apply btn border border-red-200 bg-white text-red-600 hover:bg-red-50;
+    @apply btn bg-red-600 text-white hover:bg-red-700;
+  }
+
+  .btn-ghost {
+    @apply btn text-ink-soft hover:bg-fill;
   }
 
   .input {
-    @apply w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30;
+    @apply w-full rounded-xl border border-line bg-surface px-4 py-3 text-ink placeholder:text-ink-muted focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-600/15;
   }
 
   .label {
-    @apply mb-1 block text-sm font-medium text-gray-700;
+    @apply mb-1.5 block text-sm font-medium text-ink-soft;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/40;
   }
 }
 
@@ -55,4 +63,9 @@
 html,
 body {
   overflow-x: hidden;
+}
+
+/* Angka selalu rata kolomnya (tabular) */
+.tnum {
+  font-variant-numeric: tabular-nums;
 }

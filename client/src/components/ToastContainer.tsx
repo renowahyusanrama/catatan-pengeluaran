@@ -12,18 +12,18 @@ export function ToastContainer() {
         const Icon = t.type === 'success' ? CheckCircle2 : t.type === 'error' ? AlertCircle : Info;
         const tone =
           t.type === 'success'
-            ? 'border-brand-200 bg-brand-50 text-brand-800'
+            ? 'bg-brand-600 text-white'
             : t.type === 'error'
-              ? 'border-red-200 bg-red-50 text-red-800'
-              : 'border-gray-200 bg-gray-50 text-gray-800';
+              ? 'bg-red-600 text-white'
+              : 'bg-ink text-white';
         return (
           <button
             key={t.id}
             type="button"
             onClick={() => dismissToast(t.id)}
-            className={`pointer-events-auto flex min-w-[220px] max-w-sm items-center gap-2 rounded-lg border px-3 py-2 text-sm shadow-sm ${tone}`}
+            className={`pointer-events-auto flex min-w-[220px] max-w-sm items-center gap-2.5 rounded-full px-4 py-3 text-sm font-medium text-white ${tone}`}
           >
-            <Icon size={16} className="shrink-0" />
+            <Icon size={17} className="shrink-0" />
             <span className="text-left">{t.text}</span>
           </button>
         );
